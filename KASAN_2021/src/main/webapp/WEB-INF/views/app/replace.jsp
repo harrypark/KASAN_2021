@@ -93,7 +93,10 @@
 	        <input type="hidden" id="inLunch" name="inLunch" value="N"/>
 	        <div class="modal-body">
 	        	<div class="form-group rep-info"><label class="col-sm-3 control-label"></label>
-	                <div class="col-sm-9"><label class="control-label text-info">이달 남은 대체근무 신청가능 일수 : <span id="availReplaceCount"></span>회</label></div>
+	                <div class="col-sm-9">
+	                	<label class="control-label text-info">이번달 남은 대체근무 신청가능 일수 : <span id="currAvailReplaceCount"></span>회</label>
+	                	<label class="control-label text-info">다음달 남은 대체근무 신청가능 일수 : <span id="nextAvailReplaceCount"></span>회</label>
+	                </div>
 	            </div>
 	            <div class="form-group rep-info hl-info"><label class="col-sm-3 control-label"></label>
 	                <div class="col-sm-9"><label class="control-label text-danger"> <span id="replDtInfo"></span> 에는 반휴가 신청되어 있습니다. 다른날을 선택하세요.</label></div>
@@ -151,7 +154,8 @@ var replace_table;
 var clickRow;
 var availStartTm = moment('${replace.replStartTm}', 'HH:mm');
 var tempStartTm = moment('${replace.replStartTm}', 'HH:mm');
-var availReplaceCount;
+var currAvailReplaceCount;
+var nextAvailReplaceCount;
 var availReplaceMin;
    $(document).ready(function(){
 	   replace_table = $('#replace_table').dataTable({
@@ -196,19 +200,19 @@ var availReplaceMin;
         	getReplace();
         });
        	$('#fromDate').val(moment().subtract(15, 'days').format('YYYY-MM-DD'));
-       	$('#toDate').val(moment().add(15, 'days').format('YYYY-MM-DD'));
+       	$('#toDate').val(moment().add(30, 'days').format('YYYY-MM-DD'));
        	$('#fromDate').datepicker('setDate', moment().subtract(15, 'days').format('YYYY-MM-DD'));
-    	$('#toDate').datepicker('setDate', moment().add(15, 'days').format('YYYY-MM-DD'));
+    	$('#toDate').datepicker('setDate', moment().add(30, 'days').format('YYYY-MM-DD'));
 
-	  	
+
 	  	getReplace();
 
-	  	
+
 	  	$('#suppleDt').datepicker({
     		startDate: 'today',
     		endDate :  new moment().add(30,'days').format("YYYY-MM-DD")
         });
-	  	
+
 	  	$('#replDt').datepicker({
     		startDate: 'today',
     		endDate :  new moment().add(30,'days').format("YYYY-MM-DD")
@@ -217,7 +221,7 @@ var availReplaceMin;
         });
 
 	  	replaceFormReset();
-        
+
 
         $('#replDt, #suppleDt').datepicker().on('hide', function(e) {
         	$(this).blur();
@@ -337,7 +341,7 @@ var availReplaceMin;
 		if( clickRow != null){
 			var rowData = replace_table.fnGetData(this); // 선택한 데이터 가져오기
 			if(rowData[1] != '${info.id}') return; //자신의 Id가 이니면 Exit
-			
+
 			$('#replaceForm .rep, #replaceForm .su_rep').attr("disabled",true);
 			$("#btnAdd").hide();
 			//console.log(rowData[0]);
@@ -362,7 +366,7 @@ var availReplaceMin;
 				success : function(data){
 						$('#replaceForm #id').val(data.id);
 						$('#replaceForm #replDt').val(data.replDt);
-	
+
 						$('#replaceForm #replStartTm').val(data.replStartTm);
 						$('#replaceForm #replEndTm').val(data.replEndTm);
 						$('#replaceForm #suppleDt').val(data.suppleDt);
@@ -370,14 +374,14 @@ var availReplaceMin;
 						//$('#suppleDt').datepicker('setStartDate', editSupplyStartDt(data.replDt,data.suppleDt));
 						$('#suppleDt').datepicker('setStartDate', moment(data.crtdDt).format('YYYY-MM-DD'));
 						$('#suppleDt').datepicker('setEndDate', moment(data.crtdDt).add(30, 'days').format('YYYY-MM-DD'));
-	
+
 						$('#replaceForm #memo').val(data.memo);
 						$('#replaceForm #id').val(data.id);
 						$('#deleteForm #id').val(data.id);
 						$('#modal_replace').modal('show');
 				}
 			});
-			
+
 
 		}
 	});
@@ -415,7 +419,7 @@ var availReplaceMin;
 	$("#searchDept").change(function(){
 		searchDeptUser('deptChange');
 	})
-	
+
 	$('#searchUser').change(function(){
 		getReplace();
 	})
@@ -433,14 +437,14 @@ var availReplaceMin;
 				for(var i=0; i<data.length;i++){
 					$('#searchUser').append('<option value="'+data[i].id+'">'+data[i].capsName+'('+data[i].deptName+')</option>');
 				}
-				
+
 				if(type == 'deptChange'){
 					getReplace();
 				}
 			}
 		});
    }
-   
+
 	function checkAvailableReplaceInfo(){
 		 $.ajax({
 				url : "<c:url value='/app/checkAvailableReplaceInfoAjax'/>",
@@ -448,9 +452,11 @@ var availReplaceMin;
 				type : 'POST',
 				dataType : 'json',
 				success : function(data){
-					
-					availReplaceCount = data.currCount;
-					$('#modal_replace #availReplaceCount').text(availReplaceCount);
+
+					currAvailReplaceCount = data.currCount;
+					$('#modal_replace #currAvailReplaceCount').text(currAvailReplaceCount);
+					nextAvailReplaceCount = data.nextCount;
+					$('#modal_replace #nextAvailReplaceCount').text(nextAvailReplaceCount);
 					availReplaceMin = data.todayMin;
 					$('#modal_replace #availReplaceHr').text(minToHour(availReplaceMin));
 
@@ -466,7 +472,7 @@ var availReplaceMin;
 						$('#modal_replace #replStartTm').attr("readonly",false);
 					}
 					$('#modal_replace #replEndTm').val(moment(availStartTm).add(1,'hours').format('HH:mm'));
-					
+
 					if(data.hasHl == 'yes'){
 						$('.hl-info').show();
 						$('#replDtInfo').text($('#replDt').val());
@@ -497,7 +503,7 @@ var availReplaceMin;
 			success: function(data){
 
 				if(data.availReplaceCountOver == true){
-					alert("이달 대체근무 가능일을 모두 사용하셨습니다.");
+					alert((data.replMonth=='next'?"다음달":"이번달")+" 대체근무 가능일을 모두 사용하셨습니다.");
 					return;
 				}
 				/*
@@ -512,8 +518,10 @@ var availReplaceMin;
 
 				//fnClickAddRow(data);
 				//replace_table.fnDraw();
+
 				getReplace();
 				replaceFormReset();
+
 				}
 			});
 	   }

@@ -54,6 +54,7 @@ public class UserState {
 	private String searchDt;//검색하는 날짜
 
 	private List<Workout> workout;//외근정보
+	private Workhome workhome;//재택근무
 	private BusinessTrip btrip;//출장정보
 	private Leave leave;//휴가정보
 	private HalfLeave hlLeave;//반휴정보

@@ -34,6 +34,7 @@
 		      ,data_error_yn
 		      ,(select caps_name from ks_user where id=ds.mdfy_id) as mdfy_id
 			  ,ds.mdfy_dt
+			  ,ds.st_workhome
 		  FROM ks_daily_stat ds, ks_user u
 		where ds.id=u.id and st_dm= #{searchDM}
 		<if test="searchUser != 'all'">
@@ -71,7 +72,8 @@
            ,crtd_id
            ,crtd_dt
            ,mdfy_id
-           ,mdfy_dt)
+           ,mdfy_dt
+           ,st_workhome)
      VALUES
            (#{id}
            ,#{stDt}
@@ -99,6 +101,7 @@
            ,getdate()
            ,#{mdfyId}
            ,getdate()
+           ,#{stWorkhome}
 	   )
 	</insert>
 
@@ -127,6 +130,7 @@
 		      ,data_error_yn
 		      ,(select caps_name from ks_user where id=ds.crtd_id) as crtd_id
 			  ,ds.crtd_dt
+			  ,ds.st_workhome
 		  FROM ks_daily_stat ds, ks_user u
 		where ds.id=u.id and st_dt =#{searchDt}
 			and ds.id=#{searchUser}

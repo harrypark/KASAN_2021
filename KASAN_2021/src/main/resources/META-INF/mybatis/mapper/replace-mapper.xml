@@ -18,13 +18,27 @@
 	</select>
 
 	<select id="checkAvailableReplaceInfo" parameterType="com.kspat.web.domain.SearchParam" resultType="com.kspat.web.domain.AvailableReplaceInfo">
-	select month_replace_count - (select count(distinct repl_dt) from ks_replace where crtd_id=#{crtdId} and convert(varchar(7), repl_dt, 120) =convert(varchar(7), getdate(), 120)) as currCount,
+	select month_replace_count - (select count(repl_dt) from ks_replace where crtd_id=#{crtdId} and convert(varchar(7), repl_dt, 120) =convert(varchar(7), getdate(), 120)) as currCount,
+			month_replace_count - (select count(repl_dt) from ks_replace where crtd_id=#{crtdId} and convert(varchar(7), repl_dt, 120) =convert(varchar(7), DATEADD(month, 1, GETDATE()), 120)) as nextCount,
 		   max_replace_hr*60 - ISNULL((select sum(term) from ks_replace where crtd_id=#{crtdId} and repl_dt =#{searchDt} group by repl_dt),0) as todayMin,
 		   isnull((select 	convert(varchar(5),max(repl_end_tm),114) from ks_replace where crtd_id=#{crtdId} and repl_dt=#{searchDt}),go_start_tm) as availStartTm,
 		   (select (CASE WHEN count(*) = 0 THEN 'no' ELSE 'yes' END)  from ks_half_Leave where crtd_id=#{crtdId} and hl_dt=#{searchDt}) as hasHl
 	from ks_daily_rule
 	where #{searchDt} between apply_start_dt and apply_end_dt
 	</select>
+
+	<select id="checkRequstAvailableReplaceInfo" parameterType="com.kspat.web.domain.SearchParam" resultType="com.kspat.web.domain.AvailableReplaceInfo">
+	SELECT month_replace_count -
+	       (SELECT COUNT(repl_dt)
+	       FROM    ks_replace
+	       WHERE   crtd_id                           =#{crtdId}
+	       AND     CONVERT(VARCHAR(7), repl_dt, 120) =CONVERT(VARCHAR(7), #{searchDt}, 120)
+	       )
+	       AS availCount
+	FROM   ks_daily_rule
+	WHERE  #{searchDt} BETWEEN apply_start_dt AND    apply_end_dt
+	</select>
+
 
 	<select id="getReplDtRegDtCount" parameterType="com.kspat.web.domain.SearchParam" resultType="int">
 	select count(*) from ks_replace where crtd_id=#{crtdId} and repl_dt =#{searchDt}

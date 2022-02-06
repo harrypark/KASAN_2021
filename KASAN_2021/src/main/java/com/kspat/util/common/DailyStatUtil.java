@@ -12,6 +12,7 @@ import com.kspat.web.domain.DailyRule;
 import com.kspat.web.domain.DayInfo;
 import com.kspat.web.domain.Replace;
 import com.kspat.web.domain.UserState;
+import com.kspat.web.domain.Workhome;
 import com.kspat.web.domain.Workout;
 
 public class DailyStatUtil {
@@ -93,6 +94,18 @@ public class DailyStatUtil {
 					us.setInOffice(false);
 					//logger.debug(us.toString());
 					//logger.debug("======[3].휴가의 경우 끝 =====================");
+				}else if(us.getWorkhome() != null){
+					//logger.debug("======[추가].재택근무 경우 시작 =====================");
+					//근무시간 540분
+					us.setWorkTmMin(workTime);
+					//만약 재택+반휴는 4*60
+					if(us.getHlLeave() != null) {
+						us.setWorkTmMin(240);
+					}
+					us.setInOffice(false);
+					//logger.debug(us.toString());
+					//logger.debug("======[추가].재택근무 경우 끝 =====================");
+
 				}else if(us.getHlLeave() != null){
 					logger.info("======[4].반휴의 경우 시작 =====================");
 					workTime = 4*60;//반휴근무시간
@@ -153,7 +166,7 @@ public class DailyStatUtil {
 					}
 					*/
 					us.setInOffice(checkInoffice(us));
-					//logger.debug("======[4].반휴의 경우 끝 =====================");
+					logger.debug("======[4].반휴의 경우 끝 =====================");
 				}else{
 					//일반적인경우 시작
 					//외근이 있다면
@@ -210,9 +223,9 @@ public class DailyStatUtil {
 						}else {
 							us.setExpHereOut(DateTimeUtil.getExpectedHereOutTime(us.getCalHereGo(),us.getWorkTmMin()));
 						}
-						
-						
-						
+
+
+
 						/*
 						 * 대체근무시간이 퇴근시간 쪽으로 설정되있을경우 퇴근예상시간이 대체시작시간보다 크다면 대체 시작시간을 퇴근 예상시간으로 변경
 						 */
@@ -220,7 +233,7 @@ public class DailyStatUtil {
 							//Replace re = us.getRepl();
 							//logger.debug("대체근무 시작시간:"+re.getReplStartTm());
 							//logger.debug("퇴근예정시간:"+us.getExpHereOut());
-							
+
 							/*
 							 * 대체근무가 있을 경우
 							 * 퇴근 예상시간이 대체근무 시작 시간 이후, 종료시간 이전 일경우 퇴근 예정시간을 대체근무 시작시간으로 대체
@@ -230,8 +243,8 @@ public class DailyStatUtil {
 //								us.setExpHereOut(re.getReplDt() +" "+re.getReplStartTm());
 //							}
 						//}
-						
-						
+
+
 					}
 					us.setInOffice(checkInoffice(us));
 					//logger.debug(us.toString());
@@ -257,16 +270,16 @@ public class DailyStatUtil {
 		DateTime reEndDateTime = DateTimeUtil.parseStringToDatetime(re.getReplDt() + " " + re.getReplEndTm(),"yyyy-MM-dd HH:mm");
 		//계산된 퇴근예상시간
 		DateTime orgExpHereOutDateTime = DateTimeUtil.parseStringToDatetime(expHereOut,"yyyy-MM-dd HH:mm");
-		
+
 		System.out.println("reStartDateTime:"+reStartDateTime);
 		System.out.println("orgExpHereOutDateTime:"+orgExpHereOutDateTime);
-		
+
 		if(reStartDateTime.isBefore(orgExpHereOutDateTime) && orgExpHereOutDateTime.isBefore(reEndDateTime)){
 			res=true;
 			//logger.debug("예상퇴근시간이 중간에 걸린다.");
 		}
 		return res;
-		
+
 	}
 
 
@@ -439,6 +452,31 @@ public class DailyStatUtil {
 				}else if(us.getLeave() != null){
 					//게산된 근무시간도 0
 					us.setCalWorkTmMin(0);
+				}else if(us.getWorkhome() != null){
+					//logger.debug("======[추가].재택근무 경우 시작 =====================");
+					//근무시간 540분
+					//us.setWorkTmMin(0);
+					//만약 재택+반휴는 4*60
+					if(us.getHlLeave() != null) {
+						//us.setWorkTmMin(240);
+
+						//us.setCalWorkTmMin(getCalWorkTime(us));
+					}
+					//재택근무 근무시간계산
+					Workhome wh = us.getWorkhome();
+					//logger.debug("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+					logger.debug(wh.toString());
+					DateTime goTime = DateTimeUtil.parseStringToDatetime(wh.getHomeDt()+" "+wh.getStartTm(),"yyyy-MM-dd HH:mm");
+					DateTime outTime = DateTimeUtil.parseStringToDatetime(wh.getHomeDt()+" "+wh.getEndTm(),"yyyy-MM-dd HH:mm");
+					int calWorkMin = Minutes.minutesBetween(goTime, outTime).getMinutes();
+					//logger.debug("calWorkMin:"+calWorkMin);
+					us.setCalWorkTmMin(calWorkMin);
+					//logger.debug("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+
+					us.setInOffice(false);
+					//logger.debug(us.toString());
+					//logger.debug("======[추가].재택근무 경우 끝 =====================");
+
 				}else if(us.getHlLeave() != null){
 
 					//외근이 있다면 현지 퇴근시간 체크 - 실제퇴근시간으로 대입 (게산된 퇴근시간은 nowworking에서)

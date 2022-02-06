@@ -125,6 +125,9 @@ response.setHeader("Cache-Control", "no-cache");
 		                        <a href="<c:url value="/app/replace"/>" class="menu"><i class="fa fa-exchange"></i> <span class="nav-label">대체근무</span>  </a>
 		                    </li>
 		                    <li>
+		                        <a href="<c:url value="/app/workhome"/>" class="menu"><i class="fa fa-home"></i> <span class="nav-label">재택근무 </span></a>
+		                    </li>
+		                    <li>
 		                        <a href="<c:url value="/app/businessTrip"/>" class="menu"><i class="fa fa-plane"></i> <span class="nav-label">출장관리 </span></a>
 		                    </li>
 		                    <c:if test="${authCd eq '001'}">

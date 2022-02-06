@@ -34,4 +34,6 @@ public interface ReplaceMapper {
 
 	String hasSelectDayReplace(SearchParam searchParam);
 
+	AvailableReplaceInfo checkRequstAvailableReplaceInfo(SearchParam param);
+
 }

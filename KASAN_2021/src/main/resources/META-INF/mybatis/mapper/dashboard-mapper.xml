@@ -38,6 +38,12 @@
 			   ,destination as info
 		from ks_workout	where out_dt=#{searchDt} and crtd_id=#{crtdId}
 		union all
+		select 'wh' as cssText
+			   ,'재택' as gubun
+			   ,convert(varchar(5),start_tm,114) +' ~ '+convert(varchar(5),end_tm,114) as term
+			   ,memo as info
+		from ks_workhome	where home_dt=#{searchDt} and crtd_id=#{crtdId}
+		union all
 		select 're' as  cssText
 				,'빠지는날' as gubun
 			   ,convert(varchar(5),min(repl_start_tm),114)+'~'+convert(varchar(5),max(repl_end_tm),114) as term
@@ -93,6 +99,13 @@
 			   ,destination as info
 		from ks_workout	where out_dt=#{searchDt}
 		union all
+		select crtd_id as id
+				,'wh' as cssText
+			   ,'재택' as gubun
+			   ,convert(varchar(5),start_tm,114) +' ~ '+convert(varchar(5),end_tm,114) as term
+			   ,memo as info
+		from ks_workhome	where home_dt=#{searchDt}
+		union all
 		select  crtd_id as id
 				,'re' as  cssText
 				,'빠지는날' as gubun
@@ -127,6 +140,7 @@
 		<result property="earlyHereGo" column="early_here_go"/>
 		<result property="dashState" column="dash_state"/>
 		<result property="insideTel" column="inside_tel"/>
+		<collection property="workhome" column="{searchId=id,searchDt=searchDt}" select="getUserWorkhomeInfo" />
 		<collection property="workout" javaType="ArrayList" column="{searchId=id,searchDt=searchDt}" select="getUserWorkoutInfo" />
 		<collection property="btrip" column="{searchId=id,searchDt=searchDt}" select="getUserBusinessTripInfo" />
 		<collection property="leave" column="{searchId=id,searchDt=searchDt}" select="getUserLeaveInfo" />
@@ -178,6 +192,24 @@
 		from ks_half_leave khl
 		where crtd_id=#{searchId}
 		and hl_dt = #{searchDt}
+		order by id desc
+	</select>
+
+
+	<select id="getUserWorkhomeInfo" resultType="com.kspat.web.domain.Workhome">
+		select top 1
+			id
+			,convert(varchar(10),home_dt,120) as home_dt
+			,week_name
+			,convert(varchar(5),start_tm,114) as start_tm
+			,convert(varchar(5),end_tm,114) as end_tm
+			,diffm
+			,isnull(here_go_yn,'N') as here_go_yn
+			,isnull(here_out_yn,'N') as here_out_yn
+			,crtd_id
+			,crtd_dt
+		from ks_workhome
+		where crtd_id=#{searchId} and home_dt = #{searchDt}
 		order by id desc
 	</select>
 
@@ -267,6 +299,7 @@
 			group by id,UserName
 			) e  on u.caps_id=e.id and u.caps_name=e.UserName
 		order by u.dept_cd,u.id
+
 	</select>
 
 	<select id="getCalendarList" parameterType="com.kspat.web.domain.SearchParam" resultType="com.kspat.web.domain.DashCalendar">

@@ -25,4 +25,6 @@ public class Replace extends BaseDomain{
 	private boolean availReplaceCountOver;//대체근무 신청건수 초과
 	private boolean hlSuppDuplicate;//반휴, 채우는날중복
 
+	private String replMonth;//빠지는날이 이번달(curr), 다음달(next) 인지 체크
+
 }

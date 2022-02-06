@@ -55,7 +55,7 @@ public class EmailServiceImpl implements EmailService{
 		    helper.setText(mailText, true);
 
 		    if(operate) {
-		    	mailSender.send(msg);
+		    	//mailSender.send(msg);
 		    }
 		} catch (MessagingException e) {
 		    e.printStackTrace();
@@ -78,7 +78,7 @@ public class EmailServiceImpl implements EmailService{
 
 		    helper.setText(mailText, true);
 		    if(operate) {
-		    	mailSender.send(msg);
+		    	//mailSender.send(msg);
 		    }
 
 

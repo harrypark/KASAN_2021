@@ -36,6 +36,8 @@ public class DailyStat extends BaseDomain{
 
 	private int stLongLate;
 
+	private int stWorkhome; //재택근무
+
 	private double stFailWorkTm;
 
 	private double stAbsence;

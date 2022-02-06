@@ -350,6 +350,54 @@ public class StatServiceImpl implements StatService {
 					ds.setStAbsence(0);
 					ds.setMemo("출장적용");
 
+				}else if(us.getWorkhome() != null){
+					ds.setStWorkhome(1);
+					ds.setWorkTmMin(us.getWorkTmMin());
+					ds.setGoTm(us.getCalHereGo());
+					ds.setOutTm(us.getCalHereOut());
+					ds.setExpOutTm(us.getExpHereOut());
+					ds.setLateTm(us.getLateTm());
+					ds.setCalWorkTmMin(us.getCalWorkTmMin());
+
+					if(us.getHlLeave() != null) {
+
+						//반휴체크
+						if("Y".equals(us.getHlLeave().getOffcial())){
+							ds.setStHlLeave(0.0);
+							ds.setStOffcial("Y");
+						}else{
+							ds.setStHlLeave(0.5);
+							ds.setStOffcial("N");
+						}
+						ds.setStLeave(0.0);
+						ds.setStShortLate(0);
+						ds.setStLongLate(0);
+
+						//무단결근체크
+						if(us.getCalHereGo()==null || us.getCalHereOut()==null){
+//							logger.debug("us.getCalWorkTmMin():"+us.getCalWorkTmMin());
+//							logger.debug("us.getWorkTmMin():"+us.getWorkTmMin());
+//							logger.debug("us.getDiffWorkTmMin():"+us.getDiffWorkTmMin());
+//							logger.debug("us.getWorkTmMin():"+ (us.getCalWorkTmMin()-us.getWorkTmMin()));
+							if(us.getCalWorkTmMin() !=0 && "Y".equals(us.getDashState())){//파트너 제외 20170612
+								ds.setStAbsence(1);
+							}else{
+								ds.setStAbsence(0);
+							}
+
+						}else{
+							ds.setStAbsence(0);
+						}
+						ds.setMemo("반휴적용");
+					}
+					//근무시간미준수체크
+					if(us.getDiffWorkTmMin()<0 && "Y".equals(us.getDashState())){ //파트너 제외 20170612
+						ds.setStFailWorkTm(0.5);
+					}else{
+						ds.setStFailWorkTm(0);
+					}
+
+
 				}else if(us.getLeave() != null){
 					ds.setGoTm(null);
 					ds.setOutTm(null);

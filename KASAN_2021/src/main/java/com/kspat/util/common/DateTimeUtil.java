@@ -14,7 +14,7 @@ public class DateTimeUtil {
 	static DateTimeFormatter fmt_y = DateTimeFormat.forPattern("yyyy");
 	static DateTimeFormatter fmt_ymd_hm = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
 	static DateTimeFormatter fmt_ymdhms = DateTimeFormat.forPattern("yyyyMMddHHmmss");
-
+	static DateTimeFormatter fmt_ym = DateTimeFormat.forPattern("yyyy-MM");
 
 	/**
 	 * today String
@@ -23,7 +23,7 @@ public class DateTimeUtil {
 	public static final String getTodayString(){
 		DateTime dateTime = new DateTime();
 		String today = dateTime.toString(fmt_ymd);
-		//today="2019-09-05";
+		//today="2022-02-03";
 		return today;
 	}
 
@@ -136,6 +136,29 @@ public class DateTimeUtil {
 		logger.debug("++++++++++++++++++++++++++++++++++ 야근수당신청로작 변경 기준일:"+ overtimeRuleDate);
 		return over.isBefore(cal);
 	}
+
+
+	/** 대체근무 빠지는날이 이번달인지, 다음달인지 구분
+	 * @param replDt
+	 * @return
+	 */
+	public static String replMonthCheck(String replDt) {
+		String replMonth = "curr";
+		DateTime dateTime = new DateTime();
+		String currMon = dateTime.toString(fmt_ym);
+
+		String nextMon = dateTime.plusMonths(1).toString(fmt_ym);
+
+		String replMon = replDt.substring(0,7);
+
+		//logger.debug(" util replMon:"+replMon);
+		//logger.debug(" util nextMon:"+nextMon);
+		if(replMon.equals(nextMon)) {
+			replMonth = "next";
+		}
+		return replMonth;
+	}
+
 
 
 }

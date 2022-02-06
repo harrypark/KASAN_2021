@@ -1,0 +1,24 @@
+-- 재택근무 테이블 생성
+CREATE TABLE dbo.ks_workhome (
+    id           INT IDENTITY(1,1) NOT NULL,
+    home_dt       DATE NOT NULL,
+    week_name    VARCHAR(20) NOT NULL,
+    start_tm     DATETIME NOT NULL,
+    end_tm       DATETIME NOT NULL,
+    diffm        INT,
+    here_go_yn   CHAR(1),
+    here_out_yn  CHAR(1),
+    memo         TEXT,
+    crtd_id      INT,
+    crtd_dt      DATETIME,
+    mdfy_id      INT,
+    mdfy_dt      DATETIME,
+ CONSTRAINT PK_ks_outhome
+   PRIMARY KEY CLUSTERED (id ASC) ON [PRIMARY]
+) ON [PRIMARY];
+
+-- 통계 테이블 st_workhome 컬럼추가
+
+ALTER TABLE [dbo].[ks_daily_stat] ADD
+ [st_workhome] INT NOT NULL CONSTRAINT DF_ks_daily_stat_st_workhome DEFAULT 0
+GO

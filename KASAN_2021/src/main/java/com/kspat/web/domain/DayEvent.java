@@ -18,5 +18,7 @@ public class DayEvent {
 		반휴 : hl
 		빠지는날 : re
 		채우는날 : su
+
+		재택 : wh 2022-02-05 추가
 	 */
 }

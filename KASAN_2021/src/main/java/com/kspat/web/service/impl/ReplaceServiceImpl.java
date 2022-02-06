@@ -2,13 +2,16 @@ package com.kspat.web.service.impl;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.kspat.util.common.DateTimeUtil;
+import com.kspat.web.controller.AppController;
 import com.kspat.web.domain.AvailableReplaceInfo;
 import com.kspat.web.domain.Replace;
 import com.kspat.web.domain.SearchParam;
-import com.kspat.web.domain.Workout;
 import com.kspat.web.mapper.ReplaceMapper;
 import com.kspat.web.service.EmailTempleatService;
 import com.kspat.web.service.ReplaceService;
@@ -16,6 +19,7 @@ import com.kspat.web.service.ReplaceService;
 @Service
 public class ReplaceServiceImpl implements ReplaceService{
 
+	private static final Logger logger = LoggerFactory.getLogger(ReplaceServiceImpl.class);
 	@Autowired
 	private ReplaceMapper replaceMapper;
 
@@ -42,14 +46,20 @@ public class ReplaceServiceImpl implements ReplaceService{
 		param.setCrtdId(replace.getCrtdId());
 		param.setSearchDt(replace.getReplDt());
 
-		AvailableReplaceInfo availableReplaceInfo  =  replaceMapper.checkAvailableReplaceInfo(param);
+		//빠지는날(replDt)가 이번달인지, 다음달인지 체크
+		String replMonth = DateTimeUtil.replMonthCheck(replace.getReplDt());
+		logger.debug("##### replMonth: "+replMonth);
+		re.setReplMonth(replMonth);
+
+		AvailableReplaceInfo availableReplaceInfo  =  replaceMapper.checkRequstAvailableReplaceInfo(param);
 		//이달 신청가능 대체근무가 없을때
-		if(availableReplaceInfo.getCurrCount() <= 0){
+		if(availableReplaceInfo.getAvailCount() <= 0){
 			//이미신천된 같은 날의 대체근무가 있는지 확인
-			int regCount = replaceMapper.getReplDtRegDtCount(param);
-			if(regCount==0){//없으면 신청불가
+			//int regCount = replaceMapper.getReplDtRegDtCount(param);
+			//logger.debug("------------regCount:"+regCount);
+			//if(regCount==0){//없으면 신청불가
 				availReplaceCountOver = true;
-			}
+			//}
 		}
 
 		re.setAvailReplaceCountOver(availReplaceCountOver);
@@ -70,6 +80,7 @@ public class ReplaceServiceImpl implements ReplaceService{
 
 			SearchParam searchParam = new SearchParam(replace.getId());
 			re = replaceMapper.getReplaceDetailById(searchParam);
+			re.setReplMonth(replMonth);
 
 			//대체등록정보를 부서 매니져에게 메일발송
 			emailTempleatService.setReplaceEmailTempleate(replace, "regist",replace.getDeptCd());

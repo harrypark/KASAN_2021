@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kspat.web.mapper.WorkhomeMapper">
+
+
+<select id="getUserWorkhomeList" parameterType="com.kspat.web.domain.SearchParam" resultType="com.kspat.web.domain.Workhome">
+		select kw.id
+	,convert(varchar(10),home_dt,120) as home_dt
+	,week_name
+	,convert(varchar(5),start_tm,114) as start_tm
+	,convert(varchar(5),end_tm,114) as end_tm
+	,diffm
+	,isnull(here_go_yn,'N') as here_go_yn
+	,isnull(here_out_yn,'N') as here_out_yn
+	,memo
+	,(select caps_name from ks_user where id=kw.crtd_id) as crtd_nm
+	,kw.crtd_id
+	,kw.crtd_dt
+	,(select caps_name from ks_user where id=kw.mdfy_id) as mdfy_id
+	,kw.mdfy_dt
+	from ks_Workhome kw, ks_user u
+	where kw.crtd_id=u.id and home_dt  between #{fromDate} and #{toDate}
+	<if test="searchDept != 'all'">
+	 and u.dept_cd=#{searchDept}
+	</if>
+	<if test="searchUser != 'all'">
+	 and kw.crtd_id=#{searchUser}
+	</if>
+	and u.auth_cd <![CDATA[<>]]> '003' and u.state_cd='001'
+
+	</select>
+
+
+	<insert id="insertWorkhome" parameterType="com.kspat.web.domain.Workhome" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO ks_Workhome(home_dt,week_name,start_tm,end_tm,diffm,here_go_yn,here_out_yn,memo,crtd_id,crtd_dt,mdfy_id,mdfy_dt)
+     	VALUES(convert(date,#{homeDt}),datename(dw,#{homeDt}),convert(datetime,#{homeDt}+' '+#{startTm}),convert(datetime,#{homeDt}+' '+#{endTm})
+     		,DATEDIFF(minute, convert(datetime,#{homeDt}+' '+#{startTm}), convert(datetime,#{homeDt}+' '+#{endTm}))
+           ,case when #{hereGoYn} is null then 'N' else #{hereGoYn} end
+           ,case when #{hereOutYn} is null then 'N' else #{hereOutYn} end
+           ,#{memo},#{crtdId},getdate(),#{mdfyId},getdate())
+	</insert>
+
+
+
+	<select id="getWorkhomeDetailById" parameterType="com.kspat.web.domain.SearchParam" resultType="com.kspat.web.domain.Workhome">
+		select id
+			,convert(varchar(10),home_dt,120) as home_dt
+			,week_name
+			,convert(varchar(5),start_tm,114) as start_tm
+			,convert(varchar(5),end_tm,114) as end_tm
+			,diffm
+			,isnull(here_go_yn,'N') as here_go_yn
+			,isnull(here_out_yn,'N') as here_out_yn
+			,memo
+			,crtd_id
+			,crtd_dt
+			,mdfy_id
+			,mdfy_dt
+		from ks_Workhome kh
+		where id=#{searchId}
+	</select>
+
+
+	<update id="updateWorkhome" parameterType="com.kspat.web.domain.Workhome">
+        update ks_Workhome
+        set home_dt=convert(date,#{homeDt})
+            ,week_name=datename(dw,#{homeDt})
+            ,start_tm=convert(datetime,#{homeDt}+' '+#{startTm})
+            ,end_tm=convert(datetime,#{homeDt}+' '+#{endTm})
+            ,diffm=DATEDIFF(minute, convert(datetime,#{homeDt}+' '+#{startTm}), convert(datetime,#{homeDt}+' '+#{endTm}))
+            ,here_go_yn=case when #{hereGoYn} is null then 'N' else #{hereGoYn} end
+            ,here_out_yn=case when #{hereOutYn} is null then 'N' else #{hereOutYn} end
+            ,memo=#{memo}
+            ,mdfy_id=#{mdfyId}
+            ,mdfy_dt=getdate()
+        where id=#{id}
+
+	</update>
+
+	<delete id="deleteWorkhome" parameterType="com.kspat.web.domain.Workhome">
+		delete from ks_Workhome
+		where id=#{id}
+	</delete>
+<!--
+	<select id="getWorkhomeAvailableTime" resultType="com.kspat.web.domain.Workhome">
+		select go_start_tm as start_tm
+			,convert(varchar(5),dateadd(hour, 9, go_end_tm),8) as end_tm
+		from ks_daily_rule
+		where getdate() between apply_start_dt and apply_end_dt
+	</select>
+
+ -->
+
+
+
+</mapper>

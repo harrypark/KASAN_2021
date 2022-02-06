@@ -31,6 +31,7 @@ import com.kspat.web.domain.Replace;
 import com.kspat.web.domain.Score;
 import com.kspat.web.domain.SearchParam;
 import com.kspat.web.domain.SessionInfo;
+import com.kspat.web.domain.Workhome;
 import com.kspat.web.domain.Workout;
 import com.kspat.web.service.BusinessTripService;
 import com.kspat.web.service.CodeService;
@@ -38,6 +39,7 @@ import com.kspat.web.service.LeaveService;
 import com.kspat.web.service.ReplaceService;
 import com.kspat.web.service.RuleService;
 import com.kspat.web.service.StatService;
+import com.kspat.web.service.WorkhomeService;
 import com.kspat.web.service.WorkoutService;
 
 /**
@@ -67,9 +69,12 @@ public class AppController {
 
 	@Autowired
 	private ReplaceService replaceService;
-	
+
 	@Autowired
 	private CodeService codeService;
+
+	@Autowired
+	private WorkhomeService workhomeService;
 
 	/** 외근공지 화면
 	 * @param model
@@ -86,7 +91,7 @@ public class AppController {
 		logger.debug(info.toString());
 		List<CodeData> deptList = codeService.getCommonCodeList("DEPT");
 		model.addAttribute("deptList", deptList);
-		
+
 		//외근 신청가능시간 (출근가능 시작시간 ~ 출근가능 종료시간+9시간)
 		Workout wotm = workoutService.getWorkoutAvailableTime();
 		model.addAttribute("wotm",wotm);
@@ -129,7 +134,7 @@ public class AppController {
 //				searchParam.setCrtdId(searchParam.getSearchUser());
 //			}
 		logger.debug(searchParam.toString());
-		
+
 		List<Workout> list = workoutService.getUserWorkoutList(searchParam);
 
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -186,13 +191,140 @@ public class AppController {
 		return gson.toJson(res);
 	}
 
+	/** 재택근무 화면
+	 * @param model
+	 * @param searchParam
+	 * @param request
+	 * @param response
+	 * @param session
+	 * @return
+	 */
+	@RequestMapping(value = "/workhome")
+	public String workhome(Model model, SearchParam searchParam,HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		SessionInfo info =SessionUtil.getSessionInfo(request);
+		model.addAttribute("info", info);
+		logger.debug(info.toString());
+		List<CodeData> deptList = codeService.getCommonCodeList("DEPT");
+		model.addAttribute("deptList", deptList);
+
+		/*
+		//외근 신청가능시간 (출근가능 시작시간 ~ 출근가능 종료시간+9시간)
+		Workout wotm = workoutService.getWorkoutAvailableTime();
+		model.addAttribute("wotm",wotm);
+		*/
+		return "app/workhome";
+
+	}
+
+	/** 재택근무 목록
+	 * @param model
+	 * @param searchParam
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/getUserWorkhomeListAjax",  produces="text/plain;charset=UTF-8")
+	public @ResponseBody String getUserWorkhomeListAjax(Model model,SearchParam searchParam,HttpServletRequest request) {
+		SessionInfo info =SessionUtil.getSessionInfo(request);
+//			if(!"all".equals(searchParam.getSearchUser())) {
+//				searchParam.setCrtdId(searchParam.getSearchUser());
+//			}
+		logger.debug(searchParam.toString());
+
+		List<Workhome> list = workhomeService.getUserWorkhomeList(searchParam);
+
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		return gson.toJson(list);
+	}
+
+	/** 재택근무 등록
+	 * @param model
+	 * @param workout
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value="/workhomeInsertAjax",  produces="text/plain;charset=UTF-8")
+	public @ResponseBody String workhomeInsertAjax(Model model, Workhome workhome,HttpServletRequest request) {
+		//logger.debug(workout.toString());
+		SessionInfo info =SessionUtil.getSessionInfo(request);
+		workhome.setCrtdId(Integer.toString(info.getId()));
+		workhome.setMdfyId(Integer.toString(info.getId()));
+		workhome.setDeptCd(info.getDeptCd());
+
+		workhome = workhomeService.insertWorkhome(workhome);
+		//logger.debug("return-->"+workout.toString());
+
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		return gson.toJson(workhome);
+	}
+
+	/** 재택근무 상세정보 by id
+	 * @param model
+	 * @param searchParam
+	 * @return
+	 */
+	@RequestMapping(value = "/workhomeDetailByIdAjax",  produces="text/plain;charset=UTF-8")
+	public @ResponseBody String workhomeDetailByIdAjax(Model model,SearchParam searchParam) {
+
+		Workhome wh = workhomeService.getWorkhomeDetailById(searchParam);
+
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		return gson.toJson(wh);
+	}
+
+	/** 재택근무 수정
+	 * @param model
+	 * @param workout
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/workhomeEditAjax",  produces="text/plain;charset=UTF-8")
+	public @ResponseBody String workhomeEditAjax(Model model,Workhome workhome,HttpServletRequest request) {
+		SessionInfo info =SessionUtil.getSessionInfo(request);
+		workhome.setMdfyId(Integer.toString(info.getId()));
+
+		workhome = workhomeService.updateWorkhome(workhome);
+
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		return gson.toJson(workhome);
+	}
+
+
+	/** 재택근무 삭제
+	 * @param model
+	 * @param searchParam
+	 * @return
+	 */
+	@RequestMapping(value = "/workhomeDeleteAjax",  produces="text/plain;charset=UTF-8")
+	public @ResponseBody String workhomeDeleteAjax(Model model,Workhome workhome,HttpServletRequest request) {
+		SessionInfo info =SessionUtil.getSessionInfo(request);
+		workhome.setCrtdId(Integer.toString(info.getId()));
+		workhome.setDeptCd(info.getDeptCd());
+
+		int res = workhomeService.deleteWorkhome(workhome);
+		logger.debug("삭제 결과:{}",res);
+
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		return gson.toJson(res);
+	}
+
+
+	/**
+	 *  출장
+	 * @param model
+	 * @param searchParam
+	 * @param request
+	 * @param response
+	 * @param session
+	 * @return
+	 */
+
 
 	@RequestMapping(value = "/businessTrip")
 	public String businessTrip(Model model, SearchParam searchParam,HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		SessionInfo info =SessionUtil.getSessionInfo(request);
 		model.addAttribute("info", info);
 		logger.debug(info.toString());
-		
+
 		List<CodeData> deptList = codeService.getCommonCodeList("DEPT");
 		model.addAttribute("deptList", deptList);
 		return "app/businessTrip";
@@ -270,7 +402,7 @@ public class AppController {
 		model.addAttribute("info", info);
 		logger.debug(info.toString());
 		searchParam.setId(Integer.toString(info.getId()));
-		
+
 		List<CodeData> deptList = codeService.getCommonCodeList("DEPT");
 		model.addAttribute("deptList", deptList);
 		String annualMinusUseYn = leaveService.getAnnualMinusUseYn();
@@ -306,7 +438,7 @@ public class AppController {
 			if(searchParam.getSearchDt() != null) {//반휴신청만 날짜가넘어온다. 반휴만 대체근무체크
 				map.put("hasRe",replaceService.hasSelectDayReplace(searchParam));
 			}
-			
+
 		}else{
 			map.put("result", "fail");
 		}
@@ -440,10 +572,10 @@ public class AppController {
 		SessionInfo info =SessionUtil.getSessionInfo(request);
 		model.addAttribute("info", info);
 		logger.debug(info.toString());
-		
+
 		List<CodeData> deptList = codeService.getCommonCodeList("DEPT");
 		model.addAttribute("deptList", deptList);
-		
+
 		DailyRule dr = ruleService.getCurrentDailyRule(DateTimeUtil.getTodayString());
 		Replace replace = replaceService.getReplaceAvailableTime();
 
@@ -459,7 +591,7 @@ public class AppController {
 		param.setCrtdId(Integer.toString(info.getId()));
 
 		AvailableReplaceInfo repInfo = replaceService.checkAvailableReplaceInfo(param);
-		logger.debug(repInfo.toString());
+		//logger.debug(repInfo.toString());
 
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		return gson.toJson(repInfo);

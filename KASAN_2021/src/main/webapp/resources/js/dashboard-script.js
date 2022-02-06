@@ -115,10 +115,8 @@ function exptext(str,type){
 	if (typeof str =="undefined"){
 		if(type=='go'){
 			return '출근미정';
-		}else{
-			return '퇴근미정';
 		}
-		return null;
+		return '퇴근미정';
 	}else{
 		return str.substr(11,5);
 	}

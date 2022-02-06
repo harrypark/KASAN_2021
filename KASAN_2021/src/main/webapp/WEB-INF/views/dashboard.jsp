@@ -37,7 +37,7 @@
                              	<c:otherwise>
                              		<c:forEach var="list" items="${todayEvent}">
                              			<tr class="tr-ks tr-${list.cssText}">
-			                                 <td><span class="label label-${list.cssText}">${list.gubun}</span></button> </td>
+			                                 <td><span class="label label-${list.cssText}">${list.gubun}</span> </td>
 			                                 <td>${list.term}</td>
 			                                 <td>${list.info}</td>
 			                             </tr>
@@ -150,6 +150,8 @@
 				location.href = '<c:url value="/app/replace"/>';
 			}else if($(this).hasClass('tr-su')){//go 대체근무(보충)
 				location.href = '<c:url value="/app/replace"/>';
+			}else if($(this).hasClass('tr-wh')){//go 재택근무
+				location.href = '<c:url value="/app/workhome"/>';
 			}
 		})
 

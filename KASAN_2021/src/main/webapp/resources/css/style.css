@@ -1157,6 +1157,14 @@ button.dim:active:before {
   background-color: #23c6c8;
   color: #FFFFFF;
 }
+
+.label-info,
+.badge-info,
+.label-wh{
+  background-color: #ff80ff;
+  color: #FFFFFF;
+}
+
 .label-inverse,
 .badge-inverse,
 .label-su{

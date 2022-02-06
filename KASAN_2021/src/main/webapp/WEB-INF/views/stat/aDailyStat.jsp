@@ -525,6 +525,8 @@
 
 
     function fnClickAddRow(data,type){
+
+        var workTm_workhome = minToHour(data.workTmMin)+ (data.stWorkhome==1?'<span style="font-size: 1.5em; color: #ff80ff; padding-left:5px;"><i class="fa fa-home"></i></span>':'');
     	var leave = data.stLeave?'<span class="label label-warning">'+data.stLeave+'</span>':data.stLeave;
 		var hlLeave = data.stHlLeave?'<span class="label label-warning">'+data.stHlLeave+'</span>':data.stHlLeave;
 		var offcial = data.stOffcial=='Y'?'<span class="label label-info">'+data.stOffcial+'</span>':data.stOffcial;
@@ -539,13 +541,13 @@
 		if(type=='add'){
     	var a = stat_table.fnAddData( [
 					data.id, data.capsName, data.deptName,data.stDt, data.weekName, data.holidayYn,data.goTm,data.expOutTm,earlyOutTm(data.goTm,data.workTmMin,data.outTm)
-					,data.lateTm,minToHour(data.workTmMin),belowWorkTm(data.workTmMin,data.calWorkTmMin), leave,hlLeave,offcial,shortLate,longLate
+					,data.lateTm,workTm_workhome,belowWorkTm(data.workTmMin,data.calWorkTmMin), leave,hlLeave,offcial,shortLate,longLate
 					,failWorkTm, absence,adjust,dataErrorYn
 				], false);
 		}else if(type=='update'){
     	stat_table.fnUpdate( [
 				data.id, data.capsName, data.deptName,data.stDt, data.weekName, data.holidayYn,data.goTm,data.expOutTm,earlyOutTm(data.goTm,data.workTmMin,data.outTm)
-				,data.lateTm,minToHour(data.workTmMin),belowWorkTm(data.workTmMin,data.calWorkTmMin), leave,hlLeave,offcial,shortLate,longLate
+				,data.lateTm,workTm_workhome,belowWorkTm(data.workTmMin,data.calWorkTmMin), leave,hlLeave,offcial,shortLate,longLate
 				,failWorkTm, absence,adjust,dataErrorYn
     	     				], clickRow);
 		}
