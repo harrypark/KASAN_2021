@@ -482,7 +482,10 @@ temporary rendered events).
 }
 .fc-su-event{
 	background-color: #262626; /* 채우는날 BACKGROUND color */
-} 
+}
+.fc-wh-event{
+	background-color: #ff80ff; /* 재택근무 BACKGROUND color */
+}
 
 
 

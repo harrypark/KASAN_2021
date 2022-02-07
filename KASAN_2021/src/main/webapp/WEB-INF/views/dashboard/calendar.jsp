@@ -33,6 +33,7 @@
 	                        <option value="hl">반휴</option>
 	                        <option value="re">대체(빠지는날)</option>
 	                        <option value="su">대체(채우는날)</option>
+	                        <option value="wh">재택</option>
 	                        <option value="bt">출장</option>
 	                    </select>
 	                </div>
@@ -156,7 +157,7 @@
         	   }else{
         		   element.find('.fc-title').append("(" + event.capsName + ") ");
         	   }
-        	   
+
         	   /*
         	   element.popover({
        	          title: event.title+"("+event.capsName+")",
@@ -200,7 +201,7 @@
 
       // .fullCalendar( 'addEvent', event )
 		//init get event
-       
+
 
      //prev month click event
        $('body').on('click', 'button.fc-prev-button', function() {
@@ -223,12 +224,12 @@
      	$(".fc-today-button").click(function() {
      		getEventList();
      	});
-    	
+
     	$('#searchText, #searchUser').change(function(){
     		getEventList();
     	})
-    	
-    	
+
+
         $('#searchDept').change(function(){
         	$.ajax({
    				url : "<c:url value='/management/getDeptUserAjax'/>",
@@ -241,7 +242,7 @@
    					for(var i=0; i<data.length;i++){
    						$('#searchUser').append('<option value="'+data[i].id+'">'+data[i].capsName+'('+data[i].deptName+')</option>');
    					}
-   					
+
    					getEventList();
 
    				}
@@ -282,18 +283,18 @@
      		event.allDay=list[i].allDay;
       		event.start = moment(list[i].start + "00:00").format('YYYY-MM-DD HH:mm');
       		if(list[i].allDay == true){
-      			event.end = moment(list[i].end+" 23:59").add(1, 'days').format('YYYY-MM-DD HH:mm');	
+      			event.end = moment(list[i].end+" 23:59").add(1, 'days').format('YYYY-MM-DD HH:mm');
       		}else{
       			event.end = moment(list[i].end+" 23:59").add(0, 'days').format('YYYY-MM-DD HH:mm');
       		}
-      		    		
+
      		event.description = list[i].description;
      		event.crtdId=list[i].crtdId;
      		event.capsName=list[i].capsName;
-     		
-     		//console.log(list[i].code);
+
+     		console.log(list[i].code);
      		event.className='fc-'+list[i].code+'-event';
-     		
+
      		eventsArray.push(event);
      	}
      	$('#calendar').fullCalendar( 'removeEvents' );
@@ -311,6 +312,6 @@
  		$('#modal_reservation').modal('hide');
      }
 
-    
+
     </script>
 </body>

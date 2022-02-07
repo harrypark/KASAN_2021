@@ -442,6 +442,38 @@
 	<if test="searchText == 'all'">
 	union all
 	</if>
+	<if test="searchText == 'all' or searchText == 'wh'">
+	select '재택' as type
+		   ,'wh' as code
+		   , '재택' as title
+		   , 'false' as allDay
+		   ,memo  as description
+		   ,convert(varchar(19),start_tm,20) as [start]
+		   ,convert(varchar(19),end_tm,20) as [end]
+		   ,(select caps_name from ks_user where id=wh.crtd_id) as caps_name
+		   ,crtd_id
+	from ks_workhome wh where home_dt BETWEEN #{fromDate} and #{toDate}
+		<choose>
+			<when test="searchDept != 'all'">
+				<choose>
+					<when test="searchUser == 'all'">
+					and wh.crtd_id in (select id from ks_user where dept_cd=#{searchDept} and state_cd='001')
+					</when>
+					<otherwise>
+					and wh.crtd_id = #{searchUser}
+					</otherwise>
+				</choose>
+			</when>
+			<otherwise>
+				<if test="searchUser != 'all'">
+					and wh.crtd_id = #{searchUser}
+				</if>
+			</otherwise>
+		</choose>
+	</if>
+	<if test="searchText == 'all'">
+	union all
+	</if>
 	<if test="searchText == 'all' or searchText == 're'">
 	select '빠지는날' as type
 			,'re' as  code
@@ -639,6 +671,37 @@
 				<otherwise>
 					<if test="searchUser != 'all'">
 						and wo.crtd_id = #{searchUser}
+					</if>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="searchText == 'all'">
+		union all
+		</if>
+		<if test="searchText == 'all' or searchText == 'wh'">
+			select '재택' as type
+					,'wh' as  code
+			       ,'' as destination
+			       ,memo as description
+				   ,convert(varchar(16),start_tm,20) as [start]
+				   ,convert(varchar(16),end_tm,20) as [end]
+				   ,crtd_id
+				   ,crtd_dt
+			from ks_workhome wh where home_dt BETWEEN #{fromDate} and #{toDate}
+			<choose>
+				<when test="searchDept != 'all'">
+					<choose>
+						<when test="searchUser == 'all'">
+						and wh.crtd_id in (select id from ks_user where dept_cd=#{searchDept} and state_cd='001')
+						</when>
+						<otherwise>
+						and wh.crtd_id = #{searchUser}
+						</otherwise>
+					</choose>
+				</when>
+				<otherwise>
+					<if test="searchUser != 'all'">
+						and wh.crtd_id = #{searchUser}
 					</if>
 				</otherwise>
 			</choose>

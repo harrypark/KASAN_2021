@@ -30,7 +30,7 @@
 					    <input type="text" class="form-control trap" id="toDate" name="toDate" readonly="readonly">
 					</div>
                 </div>
-                
+
                 <div class="col-lg-2 col-md-6 col-sm-12">
                     <select class="form-control chosen" id="searchText" name="searchText">
                         <option value="all">일정_전체</option>
@@ -39,6 +39,7 @@
                         <option value="hl">반휴</option>
                         <option value="re">대체(빠지는날)</option>
                         <option value="su">대체(채우는날)</option>
+                        <option value="wh">재택</option>
                         <option value="bt">출장</option>
                     </select>
                 </div>
@@ -80,7 +81,7 @@
 			        </tbody>
 			        </table>
 			  </div>
-               <!-- dataTable end --> 
+               <!-- dataTable end -->
    			</div>
         </div>
      </div>
@@ -141,18 +142,18 @@
     	//privateList();
 
 
-    	
+
     	searchDeptUser('first');
     	$("#searchDept").change(function(){
     		searchDeptUser('deptChange');
     	})
-    	
+
     	$('#searchText, #searchUser').change(function(){
     		privateList();
     	})
-    	
+
     });
-    
+
     function searchDeptUser(type){
     	$.ajax({
 			url : "<c:url value='/management/getDeptUserAjax'/>",
@@ -169,7 +170,7 @@
 					$('#searchUser').val('${userId}');
 					privateList();
 				}
-				
+
 				if(type == 'deptChange'){
 					privateList();
 				}
@@ -197,13 +198,13 @@
 		});
        }
 
-	
+
     function fnClickAddRow(data){
     	var a = private_table.fnAddData( [
     		'<span class="label label-'+data.code+'">'+data.type+'</span>', data.deptName, data.capsName,data.start, data.end, data.destination, data.description,data.crtdDt], false);
 
     }
-    
-    
+
+
 </script>
 </body>
