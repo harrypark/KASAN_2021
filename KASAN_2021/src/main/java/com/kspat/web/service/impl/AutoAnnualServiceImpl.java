@@ -196,12 +196,17 @@ public class AutoAnnualServiceImpl implements AutoAnnualService {
 					int  termDay = Days.daysBetween(hireDt.plusYears(2), yearLastDay).getDays();
 //					System.out.println("id: "+ aa.getId());
 //					System.out.println("termDay: "+ termDay);
-					double annual = (termDay*15.0)/365.0;
+					/*
+					 * 2022s년3월7일 AC구간 15에서 16으로 변경요청 반영
+					 * double annual = (termDay*15.0)/365.0;
+					 */
+					double annual = (termDay*16.0)/365.0;
 //					System.out.println("년차 d: "+ annual);
-					autoAnnual = Math.ceil(annual);//올림으로 변경[2018.06.04]
+					//autoAnnual = Math.ceil(annual);//올림으로 변경[2018.06.04]
+					autoAnnual = Math.floor(annual);//내림으로 변경[2022.03.23]
 //					System.out.println("년차 d 올림: "+ autoAnnual);
 					startDt = hireDt.plusMonths(24).toString(fmt);
-					endDt = yearLastDay.toString(fmt);;
+					endDt = yearLastDay.toString(fmt);
 					term = startDt +" ~ "+ endDt;
 					//System.out.println("		"+currDt.toString(fmt)+"		"+realYear+"		"+year+"		"+type+"("+termDay+")		"+availAnnual+"		"+term);
 				}else{
