@@ -374,13 +374,15 @@ public class StatServiceImpl implements StatService {
 						ds.setStLongLate(0);
 
 						//무단결근체크
+						//재택근무신청의경우이니 무단결근 해당없음(2022.05.19 재택과 반휴신청시 무단결근 체되는문제 메일제보)
+						/*
 						if(us.getCalHereGo()==null || us.getCalHereOut()==null){
 //							logger.debug("us.getCalWorkTmMin():"+us.getCalWorkTmMin());
 //							logger.debug("us.getWorkTmMin():"+us.getWorkTmMin());
 //							logger.debug("us.getDiffWorkTmMin():"+us.getDiffWorkTmMin());
 //							logger.debug("us.getWorkTmMin():"+ (us.getCalWorkTmMin()-us.getWorkTmMin()));
 							if(us.getCalWorkTmMin() !=0 && "Y".equals(us.getDashState())){//파트너 제외 20170612
-								ds.setStAbsence(1);
+								ds.setStAbsence(0);
 							}else{
 								ds.setStAbsence(0);
 							}
@@ -388,7 +390,8 @@ public class StatServiceImpl implements StatService {
 						}else{
 							ds.setStAbsence(0);
 						}
-						ds.setMemo("반휴적용");
+						*/
+						ds.setMemo("재택근무와 반휴적용");
 					}
 					//근무시간미준수체크
 					if(us.getDiffWorkTmMin()<0 && "Y".equals(us.getDashState())){ //파트너 제외 20170612
